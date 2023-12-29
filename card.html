@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Taiwanese foods</title>
+  <style>
+    body {
+      background-image: url(./materials/bg.jpg);
+      background-repeat: no-repeat;
+      background-size: 70vw 100vh;
+      background-position: left bottom;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 0;
+    }
+    
+    #game {
+      width: 60vw;
+      height: 70vh;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: end;
+      align-content: start;
+      padding-left: 2%;
+      padding-bottom: 4%;
+    }
+
+    #gridiant {
+      width: 30vw;
+      height: 100vh;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      background-color: brown;
+    }
+
+    .anatomy {
+      width: 28vw;
+      height: 28vw;
+      position: absolute;
+      border-radius: 3%;
+      background-image: url(./materials/G1.jpg);
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      display: none;
+    }
+
+    .card {
+      width: 150px;
+      height: 150px;
+      position: relative;
+      float: left;
+      margin: 1%;
+      transform-style: preserve-3d;
+      transition: transform 1S;
+      border: 1px dashed red;
+      border-radius: 3%;
+    }
+
+    .card-front {
+      width: 100%;
+      height: 100%;
+      background-image: url(./materials/F1.jpg);
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      position: absolute;
+      backface-visibility: hidden;
+    }
+
+    .card-back {
+      width: 100%;
+      height: 100%;
+      border-radius: 5px;
+      background-image: url(./materials/cardBack.jpg);
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      position: absolute;
+      backface-visibility: hidden;
+      transform: rotateY(180deg);
+    }
+
+    .card-close {
+      transform: rotateY(180deg);
+    }
+
+    img {
+      display: none;
+    }
+  </style>
+
+</head>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js
+  integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<body>
+  <div id="game"></div>
+  <div id="gridiant"></div>
+
+  <script>
+    for (let i = 0; i < 9; i++) {
+      $('#gridiant').append (`
+        <div class="anatomy"></div>
+      `)
+    }
+
+    for (let i = 0; i < 18; i++) {
+      $('#game').append(`
+        <div class="card card-close">
+          <div class="card-front"></div>
+          <div class="card-back"></div>
+        </div>
+      `)
+    }
+
+    $('.card').each(function (index) {
+      const number = index % 9 + 1
+      console.log(index, number)
+      $(this).find('.card-front').css('background-image', `url(./materials/F${number}.jpg)`)
+      $(this).attr('data-number', number)
+    })
+
+    for (let i = 0; i < 30; i++) {
+      const randomA = Math.round(Math.random() * 18)
+      const randomB = Math.round(Math.random() * 18)
+      $('.card').eq(randomA).insertAfter($('.card').eq(randomB))
+    }
+
+
+    $('#game').on('click', '.card', function () {
+      if (
+        $('.card:not(.card-close)').length < 2 &&
+        $(this).hasClass('card-close') &&
+        !$(this).hasClass('card-ok')
+      ) {
+        $(this).removeClass('card-close')
+        $('.anatomy').fadeOut(1000, 0)
+      }
+
+      if ($('.card:not(.card-close)').length === 2) {
+        if (
+          $('.card:not(.card-close)').eq(0).attr('data-number') ===
+          $('.card:not(.card-close)').eq(1).attr('data-number')
+        ) {
+          $('.card:not(.card-close)').addClass('card-ok')
+          $('.card:not(.card-close)').fadeTo(5000, 0)
+          const num = $('.card:not(.card-close)').eq(0).attr('data-number')
+          $('.anatomy').css('background-image', `url(./materials/G${num}.jpg)`).fadeIn(1000, 0)
+
+          setTimeout(function () {
+            $('.card:not(.card-close)').addClass('card-close')
+            if ($('.card-ok').length === $('.card').length) {
+              $('.anatomy').fadeOut(1000, 0)
+              Swal.fire("恭喜成為台灣小吃外交官!");
+            }
+          }, 5000)
+        } else {
+          setTimeout(function () {
+            $('.card:not(.card-close)').addClass('card-close')
+          }, 1000)
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>
